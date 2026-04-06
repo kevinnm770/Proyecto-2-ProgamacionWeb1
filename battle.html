@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <h1>Batalla Pokémon | Zona de guerra</h1>
+    </nav>
+    <main>
+        <div class="pokemon_descrip">
+            <div class="pokemon_info">
+                <div class="types" id="types_pokemonRival">
+                    <!-- Se cargan dinámicamente -->
+                </div>
+                <h2 id="name_pokemonRival">EJEMPLO</h2>
+                <div class="titles">
+                    <span>HP</span>
+                    <span id="value_HP_Rival">XX/XX</span>
+                </div>
+                <div class="bar_container">
+                    <div class="bar_HP" id="bar_HP_Rival"></div>
+                </div>
+            </div>
+            <img src="" alt="Pokémon rival" id="pokemon_rival_img">
+        </div>
+
+        <div class="zona_battle">
+            <h6>Esquibar (A - D)</h6>
+            <div class="celdas">
+                <div class="celda"></div>
+                <div class="celda active"><img src="" alt="Pokémon" id="MyPokemon_img_moves"></div>
+                <div class="celda rival_attack_celda"></div>
+            </div>
+
+            <h6>Selecciona un ataque</h6>
+
+            <div class="attacks">
+                <button class="attack" data-peso=""><span id="attack1"></span> <div class="carga"></div></button>
+                <button class="attack" data-peso=""><span id="attack2"></span> <div class="carga"></div></button>
+                <button class="attack" data-peso=""><span id="attack3"></span> <div class="carga"></div></button>
+                <button class="attack" data-peso=""><span id="attack4"></span> <div class="carga"></div></button>
+            </div>
+            <div class="specialAttack">
+                <!-- Se cargan dinámicamente -->
+            </div>
+        </div>
+
+        <div class="pokemon_descrip">
+            <img src="" alt="Pokémon" id="MyPokemon_img">
+            <div class="pokemon_info">
+                <div class="types" id="types_MyPokemon">
+                    <!-- Se cargan dinámicamente -->
+                </div>
+                <h2 id="name_MyPokemon">EJEMPLO</h2>
+                <div class="titles">
+                    <span>HP</span>
+                    <span id="value_HP_MyPokemon">XX/XX</span>
+                </div>
+                <div class="bar_container">
+                    <div class="bar_HP" id="bar_HP_MyPokemon"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="trainer.config.js"></script>
+    <script>
+        let tiempoRecarga = 10000, tiempoRival = 1500, esperaAtaqueRival = 1000; //ms
+        let hp_MyPokemon = 0, hp_MyPokemon_actual = 0, hp_rival = 0, hp_rival_actual = 0;
+        let stat_attack_MyPokemon = 0, stat_attack_PokemonRival = 0, stat_defense_MyPokemon = 0, stat_defense_PokemonRival = 0;
+        const colores_tipos_pokemones = {
+            "normal":   { "background": "#A8A878", "text_color": "#000000" },
+            "fire":     { "background": "#F08030", "text_color": "#000000" },
+            "water":    { "background": "#6890F0", "text_color": "#ffffff" },
+            "electric": { "background": "#F8D030", "text_color": "#000000" },
+            "grass":    { "background": "#78C850", "text_color": "#000000" },
+            "ice":      { "background": "#98D8D8", "text_color": "#000000" },
+            "fighting": { "background": "#C03028", "text_color": "#ffffff" },
+            "poison":   { "background": "#A040A0", "text_color": "#ffffff" },
+            "ground":   { "background": "#E0C068", "text_color": "#000000" },
+            "flying":   { "background": "#A890F0", "text_color": "#000000" },
+            "psychic":  { "background": "#F85888", "text_color": "#ffffff" },
+            "bug":      { "background": "#A8B820", "text_color": "#000000" },
+            "rock":     { "background": "#B8A038", "text_color": "#000000" },
+            "ghost":    { "background": "#705898", "text_color": "#ffffff" },
+            "dragon":   { "background": "#316AAC", "text_color": "#ffffff" },
+            "dark":     { "background": "#705848", "text_color": "#ffffff" },
+            "steel":    { "background": "#B8B8D0", "text_color": "#000000" },
+            "fairy":    { "background": "#EE99AC", "text_color": "#000000" }
+        };
+
+        function Recarga(contador, cargas_div){
+            setTimeout(() => {
+                contador += 1000;
+                cargas_div.forEach(div => {
+                    div.style.width = (contador/tiempoRecarga*100) + "%";
+                });
+
+                if(contador>=tiempoRecarga){
+                    cargas_div.forEach(div => {
+                        div.style.opacity = "0";
+                        div.style.transition = "none";
+                        div.parentNode.disabled = false;
+                    });
+                }else{
+                    setTimeout(Recarga(contador,cargas_div), 1000);
+                }
+            }, 1000);
+        }
+
+        function Atacar(){
+            hp_rival_actual -= (stat_attack_MyPokemon - stat_defense_PokemonRival);
+
+            if(hp_rival_actual>hp_rival){
+                hp_rival_actual=hp_rival;
+            }
+
+            if(hp_rival_actual<=0){
+                console.log("Ganaste");
+                document.querySelector("#value_HP_Rival").innerText = `0/${hp_rival}`;
+                document.querySelector("#bar_HP_Rival").style.width = `0%`;
+            }else{
+                document.querySelector("#value_HP_Rival").innerText = `${hp_rival_actual}/${hp_rival}`;
+                document.querySelector("#bar_HP_Rival").style.width = `${hp_rival_actual / hp_rival * 100}%`;
+            }
+        }
+
+        function AtaqueRival(){
+            setTimeout(() => {
+                const celdaAtaque = Math.floor(Math.random() * 3);
+                const celdas = document.querySelectorAll(".celda");
+                const bar_HP_MyPokemon = document.querySelector("#bar_HP_MyPokemon");
+
+                // Se limpian las celdas
+                celdas.forEach(celda => {
+                    celda.classList.remove('rival_attack_celda');
+                });
+
+                // Se señala el ataque
+                celdas[celdaAtaque].classList.add('rival_attack_celda');
+
+                // Se realiza el ataque
+                setTimeout(() => {
+                    celdas[celdaAtaque].classList.remove('rival_attack_celda');
+                    let pts_ataque = stat_attack_PokemonRival - stat_defense_MyPokemon;
+
+                    if(pts_ataque<0){
+                        pts_ataque=0;
+                    }
+
+                    if(hp_MyPokemon_actual-stat_attack_PokemonRival>0){
+                        if(celdas[celdaAtaque].className.includes("active")){
+                            hp_MyPokemon_actual -= stat_attack_PokemonRival;
+                            bar_HP_MyPokemon.style.width = (hp_MyPokemon_actual/hp_MyPokemon*100) + "%";
+                            document.querySelector("#value_HP_MyPokemon").innerText = `${hp_MyPokemon_actual}/${hp_MyPokemon}`;
+                        }
+                        AtaqueRival();
+                    }else{
+                        console.log("Perdiste");
+                        document.querySelector("#value_HP_MyPokemon").innerText = `0/${hp_MyPokemon}`;
+                        bar_HP_MyPokemon.style.width = `0%`;
+                    }
+
+                }, esperaAtaqueRival);
+            }, tiempoRival);
+        }
+
+        async function CargarMyPokemon(pokemon_name){
+            fetch('https://pokeapi.co/api/v2/pokemon/' + pokemon_name)
+                .then(response => {
+                    if (!response.ok) throw new Error('No encontrado');
+                    return response.json();
+                })
+                .then(pokemon => {
+                    const types = pokemon.types;
+
+                    // Tipos
+                    const tipos_my = document.querySelector("#types_MyPokemon");
+                    tipos_my.innerHTML = "";
+                    types.forEach(type => {
+                        const span = document.createElement("span");
+                        span.innerText = type.type.name;
+                        span.style.backgroundColor = colores_tipos_pokemones[type.type.name].background;
+                        span.style.color = colores_tipos_pokemones[type.type.name].text_color;
+                        tipos_my.appendChild(span);
+                    });
+
+                    // Ataques
+                    const moves = pokemon.moves.splice(0,4);
+                    let num_ataque = 1;
+
+                    moves.forEach(move => {
+                        const btn_attact = document.querySelector("#attack"+num_ataque).parentNode;
+
+                        document.querySelector("#attack"+num_ataque).innerText = move.move.name.toUpperCase();
+                        num_ataque++;
+
+                        btn_attact.addEventListener("click", function(){
+                            Atacar();
+
+                            // Se deshabilitan los botones
+                            let contador = 1000;
+                            const cargas_div = document.querySelectorAll(".carga");
+
+                            cargas_div.forEach(div => {
+                                div.parentNode.disabled = true;
+                                div.style.width = "0%";
+                                div.style.opacity = "0.1";
+                                div.style.transition = "all ease-in .5s";
+                            });
+
+                            Recarga(contador, cargas_div);
+                        });
+                    });
+
+
+                    // Nombre
+                    document.querySelector("#name_MyPokemon").innerText = pokemon_name.toUpperCase();
+
+                    // HP (formato XX/XX)
+                    const hp = pokemon.stats[0].base_stat;
+                    document.querySelector("#value_HP_MyPokemon").innerText = `${hp}/${hp}`;
+
+                    // Barra HP
+                    document.querySelector("#bar_HP_MyPokemon").style.width = `${hp / hp * 100}%`;
+                    hp_MyPokemon = hp;
+                    hp_MyPokemon_actual = hp;
+                    stat_attack_MyPokemon = pokemon.stats[1].base_stat;
+                    stat_defense_MyPokemon = pokemon.stats[2].base_stat;
+
+                    // Imagen
+                    document.querySelector("#MyPokemon_img").src = pokemon.sprites.front_default;
+
+                    document.querySelector("#MyPokemon_img_moves").src = pokemon.sprites.back_default;
+                })
+                .catch(e => {
+                    console.error(e);
+                });
+        }
+
+        async function CargarPokemonRival(pokemon_name){
+            fetch('https://pokeapi.co/api/v2/pokemon/' + pokemon_name)
+                .then(response => {
+                    if (!response.ok) throw new Error('No encontrado');
+                    return response.json();
+                })
+                .then(pokemon => {
+                    const types = pokemon.types;
+
+                    // Contenedor
+                    const pokemon_descrip = document.querySelector("#types_pokemonRival").parentNode.parentNode;
+                    pokemon_descrip.style.borderTop="5px solid "+colores_tipos_pokemones[types[0].type.name].background;
+
+                    // Tipos
+                    const tipos_rival = document.querySelector("#types_pokemonRival");
+                    tipos_rival.innerHTML = "";
+                    types.forEach(type => {
+                        const span = document.createElement("span");
+                        span.innerText = type.type.name;
+                        span.style.backgroundColor = colores_tipos_pokemones[type.type.name].background;
+                        span.style.color = colores_tipos_pokemones[type.type.name].text_color;
+                        tipos_rival.appendChild(span);
+                    });
+
+                    // Nombre
+                    document.querySelector("#name_pokemonRival").innerText = pokemon_name.toUpperCase();
+
+                    // HP (formato XX/XX)
+                    const hp = pokemon.stats[0].base_stat;
+                    document.querySelector("#value_HP_Rival").innerText = `${hp}/${hp}`;
+
+                    // Barra HP
+                    document.querySelector("#bar_HP_Rival").style.width = `${hp / hp * 100}%`;
+                    document.querySelector("#bar_HP_Rival").style.backgroundColor = colores_tipos_pokemones[types[0].type.name].background;
+                    hp_rival = hp;
+                    hp_rival_actual = hp;
+                    stat_attack_PokemonRival = pokemon.stats[1].base_stat;
+                    stat_defense_PokemonRival = pokemon.stats[2].base_stat;
+
+                    // Imagen
+                    document.querySelector("#pokemon_rival_img").src = pokemon.sprites.front_default;
+                })
+                .catch(e => {
+                    console.error(e);
+                })
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            CargarMyPokemon(TRAINER.favoritePokemon);
+            if(localStorage.getItem("PokemonRival")){
+                CargarPokemonRival(localStorage.getItem("PokemonRival"));
+            }
+
+            AtaqueRival();
+        });
+
+        document.addEventListener("keyup", (e) => {
+            const celdas = document.querySelectorAll(".celda, .celda.active");
+            const todasLasCeldas = document.querySelectorAll(".celdas > div");
+            const img = document.querySelector("#MyPokemon_img_moves");
+            const key = e.key.toLowerCase();
+
+            if (key !== "a" && key !== "d") return;
+
+            // Encontrar la celda activa actual
+            const celdaActiva = document.querySelector(".celda.active");
+            const indexActual = Array.from(todasLasCeldas).indexOf(celdaActiva);
+
+            let nuevoIndex;
+            if (key === "a") nuevoIndex = indexActual - 1;
+            if (key === "d") nuevoIndex = indexActual + 1; 
+
+            // Verificar que no se salga de los límites
+            if (nuevoIndex < 0 || nuevoIndex >= todasLasCeldas.length) return;
+
+            // Mover clase active y la imagen
+            celdaActiva.classList.remove("active");
+            celdaActiva.innerHTML = "";
+
+            todasLasCeldas[nuevoIndex].classList.add("active");
+            todasLasCeldas[nuevoIndex].appendChild(img);
+        });
+    </script>
+</body>
+</html>

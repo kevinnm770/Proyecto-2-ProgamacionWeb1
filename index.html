@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <h1>Batalla Pokémon | Zona de emparejamiento</h1>
+    </nav>
+    <main>
+        <div id="trainer_card">
+            <div id="info_trainer">
+                <span>ENTRENADOR</span>
+                <h2 id="nameTrainer"></h2>
+
+                <h4 id="cityTrainer"></h4>
+                <h4 id="PokemonNameTrainer"></h4>
+            </div>
+            <div id="phrase_trainer">
+                <p></p>
+            </div>
+            <div id="move_main">
+                <span>Movimiento especial</span>
+                <h3 id="name_MoveMain"></h3>
+            </div>
+        </div>
+
+        <div class="battle_vs">
+            <div class="Pokemon_card" id="MyPokemon">
+                <div class="head">
+                    <h3 id="namePokemon">DRUDI</h3>
+                    <div class="container_types" id="tipos_pokemon" style="display: none;">
+                        <!-- Cargado dinamicamente -->
+                    </div>
+                </div>
+
+                <div class="img_container_pokemon">
+                    <img id="MyPokemon_img" src="" alt="">
+                </div>
+
+                <div id="info_MyPokemon">
+                    <ul class="stats" id="stats_myPokemon">
+                        <!-- Cargado dinamicamente -->
+                    </ul>
+
+                    <hr>
+
+                    <h5>Movimientos</h5>
+
+                    <ul class="moves" id="moves_myPokemon">
+                        <!-- Cargado dinamicamente -->
+                    </ul>
+                </div>
+            </div>
+
+            <span>VS</span>
+
+            <div class="Pokemon_card" id="enemy">
+                <div class="head">
+                    <input type="text" id="pokemon_name_rival" placeholder="Escribe el nombre del pokémon rival">
+                    <button id="search_pokemon">Buscar</button>
+                    <div class="container_types" id="tipos_pokemon_rival" style="display: none;">
+                        <!-- Cargado dinamicamente -->
+                    </div>
+                </div>
+
+                <div id="mensaje">
+                    <h3>Sin Pokémon seleccionado</h3>
+                </div>
+
+                <div id="espera" style="display: none;">
+                    <h3>Buscando ...</h3>
+                </div>
+
+                <div id="info_pokemon" style="display: none;">
+                    <div class="img_container_pokemon">
+                        <img id="pokemon_rival" src="" alt="Pokemon rival">
+                    </div>
+
+                    <ul class="stats" id="stats_rival">
+                        <!-- Cargado dinamicamente -->
+                    </ul>
+
+                    <hr>
+
+                    <h5>Movimientos</h5>
+
+                    <ul class="moves" id="moves_rival">
+                        <!-- Cargado dinamicamente -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="container_btn">
+            <button id="btn_inicio">!A la batalla!</button>
+        </div>
+        
+    </main>
+
+    <script src="trainer.config.js"></script>
+    <script>
+        const colores_tipos_pokemones = {
+            "normal":   { "background": "#A8A878", "text_color": "#000000" },
+            "fire":     { "background": "#F08030", "text_color": "#000000" },
+            "water":    { "background": "#6890F0", "text_color": "#ffffff" },
+            "electric": { "background": "#F8D030", "text_color": "#000000" },
+            "grass":    { "background": "#78C850", "text_color": "#000000" },
+            "ice":      { "background": "#98D8D8", "text_color": "#000000" },
+            "fighting": { "background": "#C03028", "text_color": "#ffffff" },
+            "poison":   { "background": "#A040A0", "text_color": "#ffffff" },
+            "ground":   { "background": "#E0C068", "text_color": "#000000" },
+            "flying":   { "background": "#A890F0", "text_color": "#000000" },
+            "psychic":  { "background": "#F85888", "text_color": "#ffffff" },
+            "bug":      { "background": "#A8B820", "text_color": "#000000" },
+            "rock":     { "background": "#B8A038", "text_color": "#000000" },
+            "ghost":    { "background": "#705898", "text_color": "#ffffff" },
+            "dragon":   { "background": "#316AAC", "text_color": "#ffffff" },
+            "dark":     { "background": "#705848", "text_color": "#ffffff" },
+            "steel":    { "background": "#B8B8D0", "text_color": "#000000" },
+            "fairy":    { "background": "#EE99AC", "text_color": "#000000" }
+        };
+
+        async function CargarMyPokemon(pokemon_name){
+            const namePokemon = document.querySelector("#namePokemon");
+            const info=document.querySelector("#info_MyPokemon");
+            const img=document.querySelector("#MyPokemon_img");
+            const ul_stats = document.querySelector("#stats_myPokemon");
+            const tipos_pokemon = document.querySelector("#tipos_pokemon");
+            const ul_moves = document.querySelector("#moves_myPokemon");
+
+            fetch('https://pokeapi.co/api/v2/pokemon/' + pokemon_name)
+                .then(response => {
+                    if (!response.ok) throw new Error('No encontrado');
+                    return response.json();
+                })
+                .then(pokemon => {
+                    // Nombre
+                    namePokemon.innerText=pokemon_name.toUpperCase();
+
+                    // Tipo(s)
+                    const types = pokemon.types;
+                    tipos_pokemon.innerHTML="";
+
+                    types.forEach(type => {
+                        const span_type = document.createElement("span");
+                        tipos_pokemon.appendChild(span_type);
+                        span_type.innerText=type.type.name;
+                        span_type.style.backgroundColor=colores_tipos_pokemones[type.type.name].background;
+                        span_type.style.color=colores_tipos_pokemones[type.type.name].text_color;
+                    });
+
+                    tipos_pokemon.style.display="";
+
+                    // Imagen
+                    img.src = pokemon.sprites.front_default;
+
+                    // Estadisticas
+                    const stats = pokemon.stats;
+                    ul_stats.innerHTML="";
+
+                    stats.forEach(stat => {
+                        console.log(stat);
+                        const li_stat = document.createElement("li");
+                        ul_stats.appendChild(li_stat);
+                        li_stat.innerHTML=`
+                            <h6>${stat.stat.name.toUpperCase()}</h6> <span>${stat.base_stat}</span>
+                            <div class="barra_container"> <div class="level_bar" style="background-color:${colores_tipos_pokemones[types[0].type.name].background};color:${colores_tipos_pokemones[types[0].type.name].text_color};width: ${stat.base_stat/255*100}%;"></div> </div>
+                        `;
+                    });
+
+                    // Movimientos
+                    const moves = pokemon.moves.splice(0,4);
+                    ul_moves.innerHTML="";
+
+                    moves.forEach(move => {
+                        const li_move = document.createElement("li");
+                        const h5_move = document.createElement("h5");
+                        ul_moves.appendChild(li_move);
+                        li_move.appendChild(h5_move);
+                        h5_move.innerText=move.move.name.toUpperCase();
+                    });
+
+                    // Movimiento especial
+                    const li_move = document.createElement("li");
+                    const h5_move = document.createElement("h5");
+                    li_move.id="specialMove";
+                    ul_moves.appendChild(li_move);
+                    li_move.appendChild(h5_move);
+                    h5_move.innerText=TRAINER.definitiveMoveName;
+
+                    ul_moves.style.display="";
+
+                    info.style.display = "";
+                })
+                .catch(e => {
+                    console.error(e);
+                    info.style.display = "none";
+                });
+        }
+
+        async function CargarPokemonRival(pokemon_name){
+            const btn = document.querySelector("#search_pokemon");
+            const info=document.querySelector("#info_pokemon");
+            const img=document.querySelector("#pokemon_rival");
+            const mensaje=document.querySelector("#mensaje");
+            const espera=document.querySelector("#espera");
+            const ul_stats = document.querySelector("#stats_rival");
+            const tipos_pokemon_rival = document.querySelector("#tipos_pokemon_rival");
+            const ul_moves = document.querySelector("#moves_rival");
+
+            mensaje.style.display = "none";
+            espera.style.display="";
+            btn.disabled=true;
+
+            fetch('https://pokeapi.co/api/v2/pokemon/' + pokemon_name)
+                .then(response => {
+                    if (!response.ok) throw new Error('No encontrado');
+                    return response.json();
+                })
+                .then(pokemon => {
+                    // Tipo(s)
+                    const types = pokemon.types;
+                    tipos_pokemon_rival.innerHTML="";
+
+                    types.forEach(type => {
+                        const span_type = document.createElement("span");
+                        tipos_pokemon_rival.appendChild(span_type);
+                        span_type.innerText=type.type.name;
+                        span_type.style.backgroundColor=colores_tipos_pokemones[type.type.name].background;
+                        span_type.style.color=colores_tipos_pokemones[type.type.name].text_color;
+                    });
+
+                    tipos_pokemon_rival.style.display="";
+
+                    // Imagen
+                    img.src = pokemon.sprites.front_default;
+
+                    // Estadisticas
+                    const stats = pokemon.stats;
+                    ul_stats.innerHTML="";
+
+                    stats.forEach(stat => {
+                        const li_stat = document.createElement("li");
+                        ul_stats.appendChild(li_stat);
+                        li_stat.innerHTML=`
+                            <h6>${stat.stat.name.toUpperCase()}</h6> <span>${stat.base_stat}</span>
+                            <div class="barra_container"> <div class="level_bar" style="background-color:${colores_tipos_pokemones[types[0].type.name].background};color:${colores_tipos_pokemones[types[0].type.name].text_color};width: ${stat.base_stat/255*100}%;"></div> </div>
+                        `;
+                    });
+
+                    // Movimientos
+                    const moves = pokemon.moves.splice(0,4);
+                    ul_moves.innerHTML="";
+
+                    moves.forEach(move => {
+                        const li_move = document.createElement("li");
+                        const h5_move = document.createElement("h5");
+                        ul_moves.appendChild(li_move);
+                        li_move.appendChild(h5_move);
+                        h5_move.innerText=move.move.name.toUpperCase();
+                    });
+
+                    ul_moves.style.display="";
+
+                    // Se guarda en el localstorage
+                    localStorage.setItem("PokemonRival",pokemon_name);
+
+                    info.style.display = "";
+                })
+                .catch(e => {
+                    console.error(e);
+                    mensaje.childNodes[1].innerText = "Pokémon no encontrado";
+                    mensaje.style.display = "";
+                    info.style.display = "none";
+                })
+                .finally(() => {
+                    espera.style.display = "none";
+                    btn.disabled = false;
+                });
+        }
+
+        document.querySelector("#search_pokemon").addEventListener("click", function(){
+            CargarPokemonRival(document.querySelector("#pokemon_name_rival").value);
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const nameTrainer = document.querySelector("#nameTrainer");
+            const cityTrainer = document.querySelector("#cityTrainer");
+            const PokemonNameTrainer = document.querySelector("#PokemonNameTrainer");
+            const phrase_trainer = document.querySelector("#phrase_trainer");
+            const name_MoveMain = document.querySelector("#name_MoveMain");
+
+            nameTrainer.innerText=TRAINER.name;
+            cityTrainer.innerHTML=`<span>DE</span> ${TRAINER.hometown}`;
+            phrase_trainer.innerHTML=`<p>"${TRAINER.catchphrase}"</p>`;
+            PokemonNameTrainer.innerHTML=`<span>POKÉMON</span> ${TRAINER.nickname}`;
+            name_MoveMain.innerText=TRAINER.definitiveMoveName;
+
+            CargarMyPokemon(TRAINER.favoritePokemon);
+            if(localStorage.getItem("PokemonRival")){
+                CargarPokemonRival(localStorage.getItem("PokemonRival"));
+            }
+        });
+    </script>
+</body>
+</html>
