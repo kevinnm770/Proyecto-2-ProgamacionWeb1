@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav>
+        <h1>Batalla Pokémon | Zona de guerra</h1>
+    </nav>
+    <main>
+        <div class="pokemon_descrip">
+            <div class="pokemon_info">
+                <div class="types" id="types_pokemonRival">
+                    <!-- Se cargan dinámicamente -->
+                </div>
+                <h2 id="name_pokemonRival">EJEMPLO</h2>
+                <div class="titles">
+                    <span>HP</span>
+                    <span id="value_HP_Rival">XX/XX</span>
+                </div>
+                <div class="bar_container">
+                    <div class="bar_HP" id="bar_HP_Rival"></div>
+                </div>
+            </div>
+            <img src="" alt="Pokémon rival" id="pokemon_rival_img">
+        </div>
+
+        <div class="zona_battle">
+            <h6>Esquibar (A - D) <span id="mensajes_registro" class="danger" style="display: none;"></span></h6>
+            <div class="celdas">
+                <div class="celda"></div>
+                <div class="celda active"><img src="" alt="Pokémon" id="MyPokemon_img_moves"></div>
+                <div class="celda"></div>
+            </div>
+
+            <h6>Selecciona un ataque</h6>
+
+            <div class="attacks">
+                <button class="attack" data-peso=""><span id="attack1"></span> <div class="carga"></div></button>
+                <button class="attack" data-peso=""><span id="attack2"></span> <div class="carga"></div></button>
+                <button class="attack" data-peso=""><span id="attack3"></span> <div class="carga"></div></button>
+                <button class="attack" data-peso=""><span id="attack4"></span> <div class="carga"></div></button>
+            </div>
+            <button id="specialAttack">
+                Stone Fire
+            </button>
+        </div>
+
+        <div class="pokemon_descrip">
+            <img src="" alt="Pokémon" id="MyPokemon_img">
+            <div class="pokemon_info">
+                <div class="types" id="types_MyPokemon">
+                    <!-- Se cargan dinámicamente -->
+                </div>
+                <h2 id="name_MyPokemon">EJEMPLO</h2>
+                <div class="titles">
+                    <span>HP</span>
+                    <span id="value_HP_MyPokemon">XX/XX</span>
+                </div>
+                <div class="bar_container">
+                    <div class="bar_HP" id="bar_HP_MyPokemon"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="registro">
+            <!-- Se cargan dinámicamente -->
+        </div>
+
+        <div id="modal_result" style="display: none;">
+            <h3 id="title_result">Ganaste la batalla!!</h3>
+            <button id="reboot" onclick="reboot()">Reiniciar</button>
+        </div>
+    </main>
+
+    <script src="../trainer.config.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

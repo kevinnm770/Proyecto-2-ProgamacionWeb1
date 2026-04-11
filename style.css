@@ -296,6 +296,11 @@ hr{
     background-color: var(--text_secondary);
 }
 
+#btn_inicio:disabled{
+    background-color: var(--muted);
+    cursor: auto;
+}
+
 /* ------------------ BATALLA ------------------- */
 .pokemon_descrip{
     border: 1px solid var(--border);
@@ -388,6 +393,11 @@ main .pokemon_descrip:first-child .titles{
     margin: 0;
 }
 
+.zona_battle #mensajes_registro{
+    float: right;
+    margin-bottom: 10px;
+}
+
 .zona_battle .celdas{
     display: flex;
     flex-direction: row;
@@ -457,4 +467,92 @@ main .pokemon_descrip:first-child .titles{
     background-color: var(--bg);
     color: var(--muted);
     cursor: auto;
+}
+
+#specialAttack{
+    padding: 20px;
+    font-size: 1.5rem;
+    font-weight: bolder;
+    border: none;
+    width: 100%;
+    background-color: var(--secondary);
+    margin-top: 30px;
+    text-align: center;
+    opacity: .7;
+    cursor: pointer;
+    transition: all ease .5s;
+}
+
+#specialAttack:hover{
+    opacity: 1;
+}
+
+#registro{
+    border: 1px solid var(--border);
+    border-top: none;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 10px;
+}
+
+#registro span, .zona_battle #mensajes_registro{
+    padding: 10px;
+    color:white;
+    font-size: 10pt;
+    opacity: .7;
+    font-weight: normal;
+}
+
+#registro .danger, .zona_battle #mensajes_registro.danger{
+    background: linear-gradient(45deg, var(--secondary), #ffffff00);
+}
+
+#registro .warning, .zona_battle #mensajes_registro.warning{
+    background: linear-gradient(45deg, var(--text_secondary), #ffffff00);
+}
+
+#registro .success, .zona_battle #mensajes_registro.success{
+    background: linear-gradient(45deg, var(--primary), #ffffff00);
+}
+
+#modal_result{
+    position: fixed;
+    top: 40px;
+    bottom: 40px;
+    left: 40px;
+    right: 40px;
+    background-color: var(--bg);
+    border: 3px solid var(--muted);
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    gap: 50px;
+}
+
+#modal_result h3.success{
+    color: var(--primary);
+}
+
+#modal_result h3.danger{
+    color: var(--secondary);
+}
+
+#reboot{
+    width: 300px;
+    max-width: 100%;
+    margin: 20px auto 20px auto;
+    padding: 20px;
+    font-size: 2rem;
+    background-color: var(--primary);
+    color: var(--bg);
+    cursor: pointer;
+    transition: all ease-out .5s;
+}
+
+#reboot:hover{
+    background-color: var(--text_secondary);
 }
